@@ -13,34 +13,39 @@ const Home = () => {
   const [bookContent, setBookContent] = useState<typeBooks>();
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeChapter, setActiveChapter] = useState(1);
+  const [activeBook, setActiveBook] = useState(1);
+  const [bookId, setBookId] = useState(1);
 
   useEffect(() => {
     async function fetchApi() {
-    //   let data = [];
       try {
         const axiosInstance = axios.create({
-            timeout: 10000 // 10 seconds
-          });
-        const resp = await axiosInstance.get("http://52.195.171.228:8080/books/");
+          timeout: 10000,
+        });
+        const resp = await axiosInstance.get(
+          "http://52.195.171.228:8080/books/"
+        );
         setBooks(resp.data);
-        // data = resp.data;
         const respContent = await axiosInstance.get(
-          `http://52.195.171.228:8080/books/${resp.data[0].id}/`
+          `http://52.195.171.228:8080/books/${bookId}/`
         );
         const chapter_id = respContent.data.chapter_ids;
         const id = respContent.data.id;
         const title = respContent.data.title;
         setBookContent({ id: id, title: title, chapter_id: chapter_id });
-        const imagesResp = await axiosInstance.get (`http://52.195.171.228:8080/chapters/${resp.data[0].chapter_ids[0]}/`)
+        const imagesResp = await axiosInstance.get(
+          `http://52.195.171.228:8080/chapters/${resp.data[bookId-1].chapter_ids[0]}/`
+        );
         setImages(imagesResp.data.pages);
       } catch (error) {
         console.log("Api fetching error: ", error);
       } finally {
-       setIsLoading (false)
+        setIsLoading(false);
       }
     }
-    fetchApi();    
-  }, []);
+    fetchApi();
+  }, [bookId]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -55,6 +60,9 @@ const Home = () => {
       const id = resp.data.id;
       const title = resp.data.title;
       setBookContent({ id: id, title: title, chapter_id: chapter_id });
+      setBookId(bookId);
+      console.log(bookId);      
+      setActiveChapter(chapter_id[0]);
     } catch (error) {
       console.log("book error: ", error);
     }
@@ -74,7 +82,7 @@ const Home = () => {
   }
 
   return (
-    <div className="max-w-2xl h-screen w-screen flex items-center flex-col bg-gray-100 pt-5">
+    <div className="max-w-2xl h-screen w-screen flex items-center flex-col bg-white pt-5">
       <div className="flex">
         {books &&
           books.map((book: typeBooks, index: number) => {
@@ -83,15 +91,18 @@ const Home = () => {
                 key={index}
                 onClick={() => {
                   clickBtn(book.id);
+                  setActiveBook(book.id);
                 }}
-                className="border border-black w-36 py-2 rounded-md"
+                className={`border border-black w-36 py-1 rounded-sm ${
+                  activeBook === book.id ? "bg-green-900 text-white border-r-2 border-b-2" : " bg-gray-300"
+                }`}
               >
                 {book.title}
               </button>
             );
           })}
       </div>
-      <div className="flex">
+      <div className="flex mt-3">
         {bookContent?.chapter_id &&
           bookContent?.chapter_id.map((chapter_id, index: number) => {
             return (
@@ -99,8 +110,11 @@ const Home = () => {
                 key={index}
                 onClick={() => {
                   selectChapter(chapter_id);
+                  setActiveChapter(chapter_id);
                 }}
-                className="border border-black py-1 w-10 rounded-md"
+                className={`border border-black py-1 w-10 ounded-sm ${
+                  activeChapter === chapter_id ? "bg-green-900 text-white border-r-2 border-b-2" : "bg-gray-300"
+                }`}
               >
                 {chapter_id}
               </button>
