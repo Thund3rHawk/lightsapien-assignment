@@ -93,7 +93,7 @@ const Home = () => {
                   clickBtn(book.id);
                   setActiveBook(book.id);
                 }}
-                className={`border border-black w-36 py-1 rounded-sm ${
+                className={`border border-black px-2 rounded-sm ${
                   activeBook === book.id ? "bg-green-900 text-white border-r-2 border-b-2" : " bg-gray-300"
                 }`}
               >
@@ -112,7 +112,7 @@ const Home = () => {
                   selectChapter(chapter_id);
                   setActiveChapter(chapter_id);
                 }}
-                className={`border border-black py-1 w-10 ounded-sm ${
+                className={`border border-black w-8 rounded-sm ${
                   activeChapter === chapter_id ? "bg-green-900 text-white border-r-2 border-b-2" : "bg-gray-300"
                 }`}
               >
